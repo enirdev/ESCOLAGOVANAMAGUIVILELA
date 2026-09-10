@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Escola de Governo de Anápolis Maguito Vilela — Protótipo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,500;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#1D2B36;
+    --ink-soft:#4A5A64;
+    --paper:#F6F4EE;
+    --paper-alt:#EEE9DC;
+    --card:#FFFFFF;
+    --blue-deep:#1F4E5F;
+    --blue-mid:#2E7189;
+    --blue-tint:#E4EEF1;
+    --green:#4B7A57;
+    --green-tint:#E8F0E7;
+    --gold:#B8892B;
+    --line:#DAD4C4;
+    --radius:2px;
+    font-size:16px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:var(--paper);
+    color:var(--ink);
+    font-family:'Inter',sans-serif;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  h1,h2,h3,.serif{
+    font-family:'Source Serif 4',serif;
+    font-weight:600;
+    color:var(--ink);
+    margin:0;
+  }
+  a{color:inherit;text-decoration:none;}
+  img{max-width:100%;display:block;}
+  button{font-family:inherit;cursor:pointer;}
+  .wrap{max-width:1180px;margin:0 auto;padding:0 28px;}
+  :focus-visible{outline:2px solid var(--blue-mid);outline-offset:3px;}
+
+  /* ---------- utility bar ---------- */
+  .utility-bar{
+    background:var(--ink);
+    color:#D9E2E6;
+    font-size:0.8rem;
+  }
+  .utility-bar .wrap{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    height:38px;
+  }
+  .utility-left{display:flex;align-items:center;gap:14px;}
+  .utility-left .divider{width:1px;height:14px;background:#3A4A54;}
+  .utility-left .crest{
+    width:20px;height:20px;border-radius:50%;
+    border:1px solid #7C9099;
+    display:flex;align-items:center;justify-content:center;
+    font-size:9px;font-weight:700;letter-spacing:.02em;
+    flex-shrink:0;
+  }
+  .utility-right{display:flex;gap:18px;}
+  .utility-right a{opacity:.85;transition:opacity .15s;}
+  .utility-right a:hover{opacity:1;text-decoration:underline;}
+
+  /* ---------- header / nav ---------- */
+  header.main{
+    background:var(--card);
+    border-bottom:1px solid var(--line);
+    position:sticky;top:0;z-index:50;
+  }
+  .brand-row{
+    display:flex;align-items:center;justify-content:space-between;
+    padding:18px 0 14px;
+  }
+  .brand{display:flex;align-items:center;gap:14px;}
+  .brand .emblem{
+    width:46px;height:46px;flex-shrink:0;
+    border-radius:50%;
+    background:var(--blue-deep);
+    color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Source Serif 4',serif;font-weight:700;font-size:1.05rem;
+    overflow:hidden;
+  }
+  .brand .emblem img{width:100%;height:100%;object-fit:cover;}
+  .brand .name{line-height:1.15;}
+  .brand .name .line1{font-size:0.72rem;letter-spacing:.04em;color:var(--ink-soft);}
+  .brand .name .line2{font-size:1.18rem;font-family:'Source Serif 4',serif;font-weight:600;}
+
+  .portal-cta{
+    display:flex;align-items:center;gap:8px;
+    background:var(--green);
+    color:#fff;
+    padding:10px 18px;
+    border-radius:var(--radius);
+    font-size:0.88rem;font-weight:600;
+    border:none;
+    transition:background .15s;
+  }
+  .portal-cta:hover{background:#3E6949;}
+
+  nav.primary{border-top:1px solid var(--line);}
+  nav.primary ul{
+    list-style:none;margin:0;padding:0;
+    display:flex;gap:4px;
+    overflow-x:auto;
+  }
+  nav.primary li{position:relative;flex:none;}
+  nav.primary > ul > li > a, nav.primary > ul > li > button.navtop{
+    display:block;padding:14px 20px;
+    font-size:0.86rem;font-weight:600;
+    color:var(--ink);
+    background:none;border:none;
+    white-space:nowrap;
+    border-bottom:2px solid transparent;
+  }
+  nav.primary > ul > li:hover > a,
+  nav.primary > ul > li:hover > button.navtop,
+  nav.primary > ul > li.open > button.navtop{
+    color:var(--blue-deep);
+    border-bottom-color:var(--blue-deep);
+  }
+  .dropdown{
+    position:absolute;top:100%;left:0;
+    min-width:250px;
+    background:var(--card);
+    border:1px solid var(--line);
+    box-shadow:0 12px 24px rgba(29,43,54,.09);
+    padding:8px 0;
+    opacity:0;visibility:hidden;transform:translateY(4px);
+    transition:opacity .15s, transform .15s, visibility .15s;
+    z-index:60;
+  }
+  nav.primary li:hover .dropdown,
+  nav.primary li.open .dropdown{
+    opacity:1;visibility:visible;transform:translateY(0);
+  }
+  .dropdown a{
+    display:block;padding:9px 18px;
+    font-size:0.86rem;color:var(--ink-soft);
+  }
+  .dropdown a:hover{background:var(--paper-alt);color:var(--blue-deep);}
+
+  /* ---------- hero ---------- */
+  .hero{
+    padding:52px 0 60px;
+    border-bottom:1px solid var(--line);
+  }
+  .hero .wrap{
+    display:grid;
+    grid-template-columns:1.1fr 0.9fr;
+    gap:56px;
+    align-items:center;
+  }
+  .hero-eyebrow{
+    font-size:0.82rem;color:var(--blue-deep);font-weight:600;
+    margin-bottom:14px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .hero-eyebrow::before{content:"";width:22px;height:1px;background:var(--gold);}
+  .hero h1{font-size:2.55rem;line-height:1.14;letter-spacing:-.01em;margin-bottom:18px;}
+  .hero p.lede{font-size:1.06rem;color:var(--ink-soft);max-width:46ch;margin-bottom:26px;}
+  .hero-actions{display:flex;gap:12px;flex-wrap:wrap;}
+  .btn{
+    padding:12px 22px;font-size:0.9rem;font-weight:600;border-radius:var(--radius);
+    display:inline-flex;align-items:center;gap:8px;border:1px solid transparent;
+  }
+  .btn-primary{background:var(--blue-deep);color:#fff;}
+  .btn-primary:hover{background:#173C49;}
+  .btn-ghost{border-color:var(--line);color:var(--ink);background:transparent;}
+  .btn-ghost:hover{border-color:var(--blue-deep);color:var(--blue-deep);}
+
+  /* rotating news card */
+  .carousel{
+    background:var(--blue-deep);
+    color:#fff;
+    border-radius:var(--radius);
+    aspect-ratio:4/3.1;
+    position:relative;
+    overflow:hidden;
+  }
+  .carousel .slide{
+    position:absolute;inset:0;
+    display:flex;flex-direction:column;justify-content:flex-end;
+    padding:26px;
+    opacity:0;
+    transition:opacity .8s ease;
+  }
+  .carousel .slide.active{opacity:1;}
+  .carousel .slide .tag{
+    font-size:.72rem;font-weight:700;letter-spacing:.03em;
+    color:#CFE3D6;margin-bottom:8px;
+  }
+  .carousel .slide .art{
+    position:absolute;inset:0;
+    background:linear-gradient(155deg,var(--blue-mid) 0%, var(--blue-deep) 62%);
+    z-index:-1;
+  }
+  .carousel .slide .art::after{
+    content:"";position:absolute;right:-40px;top:-40px;
+    width:220px;height:220px;border-radius:50%;
+    background:rgba(255,255,255,.06);
+  }
+  .carousel .slide h3{color:#fff;font-size:1.28rem;line-height:1.28;margin-bottom:6px;}
+  .carousel .slide .meta{font-size:.8rem;color:#CFE3D6;}
+  .carousel-dots{
+    position:absolute;bottom:16px;right:20px;display:flex;gap:6px;z-index:5;
+  }
+  .carousel-dots button{
+    width:7px;height:7px;border-radius:50%;border:none;
+    background:rgba(255,255,255,.4);padding:0;
+  }
+  .carousel-dots button.active{background:#fff;}
+
+  /* ---------- section heading ---------- */
+  .section{padding:64px 0;}
+  .section.alt{background:var(--paper-alt);}
+  .section-head{
+    display:flex;justify-content:space-between;align-items:flex-end;
+    margin-bottom:34px;gap:24px;flex-wrap:wrap;
+    border-bottom:1px solid var(--line);
+    padding-bottom:18px;
+  }
+  .section-head h2{font-size:1.7rem;}
+  .section-head .sub{color:var(--ink-soft);font-size:.94rem;margin-top:6px;}
+  .see-all{font-size:.86rem;font-weight:600;color:var(--blue-deep);white-space:nowrap;}
+  .see-all:hover{text-decoration:underline;}
+
+  /* ---------- courses ---------- */
+  .courses-grid{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:22px;
+  }
+  .course-card{
+    background:var(--card);
+    border:1px solid var(--line);
+    display:flex;flex-direction:column;
+    transition:box-shadow .15s, transform .15s;
+  }
+  .course-card:hover{box-shadow:0 10px 22px rgba(29,43,54,.08);transform:translateY(-2px);}
+  .course-thumb{
+    aspect-ratio:16/10;
+    background:linear-gradient(135deg,var(--green) 0%,#2F5A3B 100%);
+    background-size:cover;
+    background-position:center;
+    position:relative;
+  }
+  .course-thumb.b2{background:linear-gradient(135deg,var(--blue-mid) 0%,var(--blue-deep) 100%);}
+  .course-thumb.b3{background:linear-gradient(135deg,#C79A3E 0%,var(--gold) 100%);}
+  .course-thumb.has-img{background-blend-mode:multiply;}
+  .course-thumb .badge{
+    position:absolute;top:12px;left:12px;
+    background:rgba(255,255,255,.92);color:var(--ink);
+    font-size:.7rem;font-weight:700;padding:4px 9px;border-radius:2px;
+  }
+  .course-body{padding:18px 18px 20px;display:flex;flex-direction:column;gap:10px;flex:1;}
+  .course-body h3{font-size:1.02rem;line-height:1.35;font-weight:600;}
+  .course-meta{
+    display:flex;flex-wrap:wrap;gap:6px 14px;
+    font-size:.78rem;color:var(--ink-soft);
+  }
+  .course-meta span{display:flex;align-items:center;gap:5px;}
+  .course-foot{
+    margin-top:auto;padding-top:8px;
+    display:flex;justify-content:space-between;align-items:center;
+    border-top:1px solid var(--line);
+  }
+  .course-foot a{font-size:.84rem;font-weight:600;color:var(--blue-deep);}
+  .course-foot a:hover{text-decoration:underline;}
+
+  /* ---------- portal do aluno + quick links ---------- */
+  .split{
+    display:grid;grid-template-columns:1fr 1fr;gap:40px;
+  }
+  .portal-panel{
+    background:var(--blue-deep);
+    color:#fff;
+    padding:38px;
+  }
+  .portal-panel .tag{font-size:.78rem;color:#B7D4CE;font-weight:600;letter-spacing:.02em;margin-bottom:10px;}
+  .portal-panel h2{color:#fff;font-size:1.55rem;margin-bottom:10px;}
+  .portal-panel p{color:#CFE0E5;font-size:.92rem;margin-bottom:24px;max-width:40ch;}
+  .field{margin-bottom:14px;}
+  .field label{display:block;font-size:.78rem;color:#CFE0E5;margin-bottom:6px;}
+  .field input{
+    width:100%;padding:11px 12px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.28);
+    color:#fff;font-size:.9rem;border-radius:2px;
+  }
+  .field input::placeholder{color:#9FB8BE;}
+  .field input:focus{background:rgba(255,255,255,.14);}
+  .portal-actions{display:flex;align-items:center;justify-content:space-between;margin-top:18px;flex-wrap:wrap;gap:12px;}
+  .portal-actions .btn-primary{background:var(--gold);}
+  .portal-actions .btn-primary:hover{background:#9C7423;}
+  .portal-actions .link{font-size:.82rem;color:#CFE0E5;}
+  .portal-actions .link:hover{color:#fff;text-decoration:underline;}
+  .portal-track{
+    margin-top:26px;padding-top:22px;border-top:1px solid rgba(255,255,255,.18);
+    display:flex;gap:22px;flex-wrap:wrap;
+  }
+  .portal-track div{font-size:.78rem;color:#B7D4CE;}
+  .portal-track strong{display:block;font-family:'Source Serif 4',serif;font-size:1.3rem;color:#fff;font-weight:600;}
+
+  .quicklinks{display:flex;flex-direction:column;gap:14px;}
+  .quicklink{
+    display:flex;gap:16px;align-items:flex-start;
+    padding:20px;background:var(--card);border:1px solid var(--line);
+    transition:border-color .15s;
+  }
+  .quicklink:hover{border-color:var(--blue-deep);}
+  .quicklink .ic{
+    width:38px;height:38px;flex-shrink:0;border-radius:50%;
+    display:flex;align-items:center;justify-content:center;
+    background:var(--green-tint);color:var(--green);
+    font-family:'Source Serif 4',serif;font-weight:700;
+  }
+  .quicklink .ic.blue{background:var(--blue-tint);color:var(--blue-deep);}
+  .quicklink .ic.gold{background:#F2E7CE;color:var(--gold);}
+  .quicklink h4{font-size:.98rem;font-weight:600;margin-bottom:3px;}
+  .quicklink p{font-size:.82rem;color:var(--ink-soft);margin:0;}
+
+  /* ---------- footer ---------- */
+  footer{
+    background:var(--ink);
+    color:#B9C4CB;
+    padding:56px 0 26px;
+    margin-top:20px;
+  }
+  .footer-grid{
+    display:grid;grid-template-columns:1.3fr 1fr 1fr 1fr;gap:40px;
+    padding-bottom:38px;border-bottom:1px solid #33414A;
+  }
+  footer h5{
+    color:#fff;font-size:.86rem;font-weight:600;margin-bottom:16px;
+    font-family:'Inter',sans-serif;letter-spacing:.01em;
+  }
+  footer ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px;}
+  footer ul a{font-size:.85rem;color:#B9C4CB;}
+  footer ul a:hover{color:#fff;text-decoration:underline;}
+  .footer-brand{display:block;}
+  .footer-brand .emblem{
+    width:40px;height:40px;border-radius:50%;overflow:hidden;
+    background:var(--blue-deep);color:#fff;
+    display:flex;align-items:center;justify-content:center;
+    font-family:'Source Serif 4',serif;font-weight:700;font-size:.9rem;
+  }
+  .footer-brand .emblem img{width:100%;height:100%;object-fit:cover;}
+  .footer-brand p{font-size:.85rem;color:#98A6AE;max-width:34ch;margin-top:12px;}
+  .footer-contact{display:flex;gap:12px;margin-top:18px;}
+  .footer-contact a{
+    width:34px;height:34px;border-radius:50%;
+    border:1px solid #47555D;
+    display:flex;align-items:center;justify-content:center;
+    font-size:.72rem;font-weight:700;color:#B9C4CB;
+  }
+  .footer-contact a:hover{border-color:#fff;color:#fff;}
+  .footer-bottom{
+    padding-top:22px;display:flex;justify-content:space-between;
+    font-size:.78rem;color:#7C8A92;flex-wrap:wrap;gap:10px;
+  }
+
+  @media (max-width:900px){
+    .hero .wrap{grid-template-columns:1fr;}
+    .courses-grid{grid-template-columns:repeat(2,1fr);}
+    .split{grid-template-columns:1fr;}
+    .footer-grid{grid-template-columns:1fr 1fr;}
+  }
+  @media (max-width:600px){
+    .courses-grid{grid-template-columns:1fr;}
+    .hero h1{font-size:1.95rem;}
+    .footer-grid{grid-template-columns:1fr;}
+    .brand .name .line2{font-size:1rem;}
+  }
+  @media (prefers-reduced-motion:reduce){
+    .carousel .slide{transition:none;}
+    .course-card{transition:none;}
+  }
+</style>
+</head>
+<body>
+
+<!-- UTILITY BAR -->
+<div class="utility-bar">
+  <div class="wrap">
+    <div class="utility-left">
+      <span class="crest">PA</span>
+      <span>Prefeitura de Anápolis</span>
+      <span class="divider"></span>
+      <span>Secretaria de Administração, Gestão de Pessoas e Inovação</span>
+    </div>
+    <div class="utility-right">
+        <a href="#">Fale conosco</a>
+    </div>
+  </div>
+</div>
+
+<!-- HEADER -->
+<header class="main">
+  <div class="wrap brand-row">
+    <a href="#" class="brand">
+      <div class="emblem"><img src="images/logo.jpeg" alt="Logotipo Escola de Governo"></div>
+      <div class="name">
+        <div class="line1">ESCOLA DE GOVERNO DE ANÁPOLIS</div>
+        <div class="line2">Maguito Vilela</div>
+      </div>
+    </a>
+    <button class="portal-cta" onclick="document.getElementById('portal').scrollIntoView({behavior:'smooth'})">
+      Portal do Aluno
+    </button>
+  </div>
+
+  <nav class="primary">
+    <div class="wrap">
+      <ul>
+        <li>
+          <a href="#">Escola de Governo</a>
+          <div class="dropdown">
+            <a href="#">Apresentação, missão e visão</a>
+            <a href="#">Histórico</a>
+            <a href="#">Organograma</a>
+            <a href="#">Plano Anual de Desenvolvimento Institucional</a>
+            <a href="#">Projetos institucionais</a>
+            <a href="#">Projetos culturais</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Cursos</a>
+          <div class="dropdown">
+            <a href="#">Cursos online</a>
+            <a href="#">Cursos híbridos</a>
+            <a href="#">Cursos presenciais</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Certificação</a>
+          <div class="dropdown">
+            <a href="#">Consultar por CPF</a>
+            <a href="#">Certificados disponíveis</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Banco de Talentos do Servidor</a>
+          <div class="dropdown">
+            <a href="#">Decreto normativo</a>
+            <a href="#">Editais internos</a>
+            <a href="#">Cadastre aqui o seu talento</a>
+            <a href="#">Resultado da seleção</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Relatório Anual</a>
+          <div class="dropdown">
+            <a href="#">2026</a>
+            <a href="#">2027</a>
+            <a href="#">2028</a>
+          </div>
+        </li>
+        <li>
+          <a href="#">Galeria</a>
+          <div class="dropdown">
+            <a href="#">Fotos</a>
+            <a href="#">Vídeos</a>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </nav>
+</header>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="wrap">
+    <div>
+      <div class="hero-eyebrow">Escola de Governo Maguito Vilela</div>
+      <h1>Escola de Governo de Anápolis Maguito Vilela.</h1>
+      <p class="lede">A trajetória de formação do servidor de Anápolis, em um só lugar.</p>
+      <div class="hero-actions">
+        <a href="#cursos" class="btn btn-primary">Ver cursos abertos</a>
+        <a href="#portal" class="btn btn-ghost">Acessar Portal do Aluno</a>
+      </div>
+    </div>
+
+    <div class="carousel" id="carousel">
+      <div class="slide active">
+        <div class="art"></div>
+        <div class="tag">NOTÍCIA</div>
+        <h3>Inscrições abertas para a turma 2026 de Gestão Pública</h3>
+        <div class="meta">Publicado em 02 de setembro</div>
+      </div>
+      <div class="slide">
+        <div class="art"></div>
+        <div class="tag">COMUNICADO</div>
+        <h3>Novo calendário de capacitações do 2º semestre está disponível</h3>
+        <div class="meta">Publicado em 28 de agosto</div>
+      </div>
+      <div class="slide">
+        <div class="art"></div>
+        <div class="tag">EVENTO</div>
+        <h3>Encontro de instrutores do Banco Municipal de Instrutores</h3>
+        <div class="meta">Publicado em 19 de agosto</div>
+      </div>
+      <div class="carousel-dots">
+        <button class="active" data-i="0" aria-label="Slide 1"></button>
+        <button data-i="1" aria-label="Slide 2"></button>
+        <button data-i="2" aria-label="Slide 3"></button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CURSOS EM DESTAQUE -->
+<section class="section" id="cursos">
+  <div class="wrap">
+    <div class="section-head">
+      <div>
+        <h2>Cursos em destaque</h2>
+        <div class="sub">Formações com inscrições abertas ou em andamento</div>
+      </div>
+      <a href="#" class="see-all">Ver todos os cursos</a>
+    </div>
+
+    <div class="courses-grid">
+      <article class="course-card">
+        <div class="course-thumb has-img" style="background-image:url('images/gestao-processos.jpg')"><span class="badge">Inscrições abertas</span></div>
+        <div class="course-body">
+          <h3>Gestão de Processos no Serviço Público</h3>
+          <div class="course-meta">
+            <span>20h</span><span>Online</span><span>14/09 a 30/10</span>
+          </div>
+          <div class="course-foot"><span></span><a href="#">Saiba mais</a></div>
+        </div>
+      </article>
+
+      <article class="course-card">
+        <div class="course-thumb b2 has-img" style="background-image:url('images/gestao-publica.jpg')"><span class="badge">Em andamento</span></div>
+        <div class="course-body">
+          <h3>Fundamentos de Gestão Pública Municipal</h3>
+          <div class="course-meta">
+            <span>40h</span><span>Híbrido</span><span>01/09 a 15/11</span>
+          </div>
+          <div class="course-foot"><span></span><a href="#">Saiba mais</a></div>
+        </div>
+      </article>
+
+      <article class="course-card">
+        <div class="course-thumb b3"><span class="badge">Inscrições abertas</span></div>
+        <div class="course-body">
+          <h3>Atendimento ao Cidadão e Excelência no Serviço</h3>
+          <div class="course-meta">
+            <span>16h</span><span>Presencial</span><span>21/09 a 25/09</span>
+          </div>
+          <div class="course-foot"><span></span><a href="#">Saiba mais</a></div>
+        </div>
+      </article>
+
+      <article class="course-card">
+        <div class="course-thumb has-img" style="background-image:url('images/administracao.jpg')"><span class="badge">Aberto</span></div>
+        <div class="course-body">
+          <h3>Introdução à Administração Pública</h3>
+          <div class="course-meta">
+            <span>24h</span><span>Online</span><span>10/10 a 07/11</span>
+          </div>
+          <div class="course-foot"><span></span><a href="#">Saiba mais</a></div>
+        </div>
+      </article>
+
+      <article class="course-card">
+        <div class="course-thumb b2 has-img" style="background-image:url('images/licitacoes.jpg')"><span class="badge">Inscrições abertas</span></div>
+        <div class="course-body">
+          <h3>Licitações e Contratos Administrativos</h3>
+          <div class="course-meta">
+            <span>24h</span><span>Online</span><span>10/10 a 07/11</span>
+          </div>
+          <div class="course-foot"><span></span><a href="#">Saiba mais</a></div>
+        </div>
+      </article>
+
+      <article class="course-card">
+        <div class="course-thumb b3 has-img" style="background-image:url('images/lideranca.jpg')"><span class="badge">Em breve</span></div>
+        <div class="course-body">
+          <h3>Liderança e Gestão de Equipes no Setor Público</h3>
+          <div class="course-meta">
+            <span>20h</span><span>Híbrido</span><span>Turma 2027</span>
+          </div>
+          <div class="course-foot"><span></span><a href="#">Saiba mais</a></div>
+        </div>
+      </article>
+    </div>
+  </div>
+</section>
+
+<!-- PORTAL DO ALUNO + ACESSOS RÁPIDOS -->
+<section class="section alt" id="portal">
+  <div class="wrap split">
+    <div class="portal-panel">
+      <div class="tag">ÁREA DO SERVIDOR</div>
+      <h2>Portal do Aluno</h2>
+      <!--<p>Acompanhe cursos, notas, frequência, carga horária e emita seus certificados em um único ambiente.</p>-->
+
+      <form onsubmit="return false;">
+        <div class="field">
+          <label for="login">CPF ou e-mail institucional</label>
+          <input id="login" type="text" placeholder="000.000.000-00">
+        </div>
+        <div class="field">
+          <label for="senha">Senha</label>
+          <input id="senha" type="password" placeholder="••••••••">
+        </div>
+        <div class="portal-actions">
+          <button class="btn btn-primary" type="submit">Entrar</button>
+          <a href="#" class="link">Esqueci minha senha</a>
+        </div>
+      </form>
+
+      <div class="portal-track">
+        <div><strong>12</strong>cursos concluídos</div>
+        <div><strong>3</strong>em andamento</div>
+        <div><strong>96h</strong>carga horária</div>
+      </div>
+    </div>
+
+    <div class="quicklinks">
+      <div class="quicklink">
+        <div class="ic blue">C</div>
+        <div>
+          <h4>Certificação</h4>
+          <p>Consulte e emita certificados usando seu CPF, com código de validação de autenticidade.</p>
+        </div>
+      </div>
+      <div class="quicklink">
+        <div class="ic">BT</div>
+        <div>
+          <h4>Banco de Talentos do Servidor</h4>
+          <p>Cadastre seu talento, acompanhe editais internos e resultados de seleção.</p>
+        </div>
+      </div>
+      <div class="quicklink">
+        <div class="ic gold">RA</div>
+        <div>
+          <h4>Relatório Anual</h4>
+          <p>Indicadores e resultados da Escola de Governo por ano — 2026, 2027, 2028.</p>
+        </div>
+      </div>
+      <div class="quicklink">
+        <div class="ic blue">G</div>
+        <div>
+          <h4>Galeria</h4>
+          <p>Registro fotográfico e em vídeo das ações realizadas pela Escola.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <div class="wrap footer-grid">
+    <div class="footer-brand">
+      <div class="emblem"><img src="images/logo.jpeg" alt="Logotipo Escola de Governo"></div>
+      <p>Escola de Governo Maguito Vilela — formação e desenvolvimento contínuo dos servidores públicos municipais de Anápolis.</p>
+      <div class="footer-contact">
+        <a href="#" aria-label="E-mail">@</a>
+        <a href="#" aria-label="WhatsApp">W</a>
+        <a href="#" aria-label="Instagram">IG</a>
+      </div>
+    </div>
+    <div>
+      <h5>Escola de Governo</h5>
+      <ul>
+        <li><a href="#">Apresentação</a></li>
+        <li><a href="#">Histórico</a></li>
+        <li><a href="#">Organograma</a></li>
+        <li><a href="#">Projetos institucionais</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Formação</h5>
+      <ul>
+        <li><a href="#">Cursos</a></li>
+        <li><a href="#">Certificação</a></li>
+        <li><a href="#">Banco de Talentos do Servidor</a></li>
+        <li><a href="#">Relatório Anual</a></li>
+      </ul>
+    </div>
+    <div>
+      <h5>Institucional</h5>
+      <ul>
+        <li><a href="#">Prefeitura de Anápolis</a></li>
+        <li><a href="#">Secretaria de Administração, Gestão de Pessoas e Inovação</a></li>
+        <li><a href="#">Legislação</a></li>
+        <li><a href="#">Fale conosco</a></li>
+      </ul>
+    </div>
+  </div>
+  <div class="wrap footer-bottom">
+    <span>© 2026 Escola de Governo Maguito Vilela — Prefeitura Municipal de Anápolis</span>
+    <span>Protótipo de navegação — conteúdo ilustrativo</span>
+  </div>
+</footer>
+
+<script>
+  // dropdown on click for touch devices1
+  document.querySelectorAll('nav.primary > ul > li').forEach(li=>{
+    li.addEventListener('click', e=>{
+      if(e.target.closest('.dropdown')) return;
+      if(window.matchMedia('(hover: none)').matches){
+        e.preventDefault();
+        document.querySelectorAll('nav.primary li.open').forEach(o=>{if(o!==li) o.classList.remove('open');});
+        li.classList.toggle('open');
+      }
+    });
+  });
+
+  // hero carousel
+  (function(){
+    const slides = document.querySelectorAll('#carousel .slide');
+    const dots = document.querySelectorAll('.carousel-dots button');
+    let i = 0;
+    function show(n){
+      slides.forEach(s=>s.classList.remove('active'));
+      dots.forEach(d=>d.classList.remove('active'));
+      slides[n].classList.add('active');
+      dots[n].classList.add('active');
+      i = n;
+    }
+    dots.forEach(d=>d.addEventListener('click', ()=>show(parseInt(d.dataset.i))));
+    const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    if(!reduce){
+      setInterval(()=>show((i+1)%slides.length), 5000);
+    }
+  })();
+</script>
+
+</body>
+</html>
